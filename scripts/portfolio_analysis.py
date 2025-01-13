@@ -80,6 +80,7 @@ def visualize_drawdown(drawdown):
   plt.axhline(0, color='red', linestyle='--', alpha=0.7)
   plt.grid()
   plt.show()
+  return plt.gcf()
 
 
 def visualize_var_cvar(returns, var, cvar, confidence_level):
@@ -103,3 +104,4 @@ def visualize_var_cvar(returns, var, cvar, confidence_level):
   plt.legend()
   plt.grid()
   plt.show()
+  return plt.gcf()

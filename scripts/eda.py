@@ -54,9 +54,11 @@ def analyze_returns(returns_data):
 
   # Step 5: Correlation Matrix
   plt.figure(figsize=(10, 8))
-  sns.heatmap(returns_data.corr(), annot=True, cmap="coolwarm", fmt=".2f")
+  returns_data_without_date = returns_data.drop('Date', axis=1)
+  sns.heatmap(returns_data_without_date.corr(), annot=True, cmap="coolwarm", fmt=".2f")
   plt.title("Correlation Matrix of Asset Returns")
   plt.show()
+  return plt.gcf()
 
 
 def analyze_volatility(returns_data):
@@ -68,21 +70,25 @@ def analyze_volatility(returns_data):
   """
 
   # Step 6: Analyze Volatility
-  volatility = returns_data.std() * np.sqrt(252)  # Annualized volatility
+  returns_data_without_date = returns_data.drop('Date', axis=1)
+  volatility = returns_data_without_date.std() * np.sqrt(252)  # Annualized volatility
   print("\nAnnualized Volatility (Std Dev):")
   print(volatility)
 
   # Step 7: Rolling Volatility
   plt.figure(figsize=(12, 6))
   for ticker in returns_data.columns:
-    rolling_vol = returns_data[ticker].rolling(window=30).std() * np.sqrt(252)
-    plt.plot(rolling_vol, label=f"{ticker} (30-Day)")
+    if pd.api.types.is_numeric_dtype(returns_data[ticker]):
+      rolling_vol = returns_data[ticker].rolling(window=30).std() * np.sqrt(252)
+    # rolling_vol = returns_data[ticker].rolling(window=30).std() * np.sqrt(252)
+      plt.plot(rolling_vol, label=f"{ticker} (30-Day)")
   plt.title("Rolling Annualized Volatility (30-Day)")
   plt.xlabel("Date")
   plt.ylabel("Volatility")
   plt.legend(loc="upper left")
   plt.grid()
   plt.show()
+  return plt.gcf()
 
 
 def analyze_cumulative_returns(returns_data):
@@ -102,3 +108,4 @@ def analyze_cumulative_returns(returns_data):
   plt.ylabel("Cumulative Returns")
   plt.grid()
   plt.show()
+  return plt.gcf()
