@@ -75,7 +75,7 @@ def visualize_drawdown(drawdown):
   Args:
       drawdown (pandas.Series): Series containing drawdown values.
   """
-  plt.figure(figsize=(12, 6))
+  plt.figure(figsize=(10, 8))
   drawdown.plot(title="Drawdown Over Time", ylabel="Drawdown", xlabel="Date")
   plt.axhline(0, color='red', linestyle='--', alpha=0.7)
   plt.grid()
@@ -93,7 +93,7 @@ def visualize_var_cvar(returns, var, cvar, confidence_level):
       cvar (pandas.Series): CVaR for each asset.
       confidence_level (float): Confidence level.
   """
-  plt.figure(figsize=(12, 6))
+  plt.figure(figsize=(10, 7.34))
   for ticker in returns.columns:
     sns.histplot(returns[ticker], bins=50, kde=True, label=ticker, alpha=0.6)
     plt.axvline(var[ticker], color='red', linestyle='--', label=f"VaR ({ticker})")

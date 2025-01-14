@@ -132,38 +132,62 @@ if uploaded_close_prices_file is not None and uploaded_returns_file is not None:
     close_prices_data = pd.read_csv(uploaded_close_prices_file)
     returns_data = pd.read_csv(uploaded_returns_file)
 
+    returns_data_without_date = returns_data.drop('Date', axis=1)
+
     # Data Summary
     st.header("Data Summary")
-    st.write("**Close Prices**")
-    st.dataframe(close_prices_data.describe())
-    st.write("**Daily Returns**")
-    st.dataframe(returns_data.describe())
+
+    # Create two columns for displaying data side by side
+    col1, col2 = st.columns(2)
+
+    # Display Close Prices in the first column
+    with col1:
+        st.subheader("Close Prices Summary")
+        st.dataframe(close_prices_data.describe())
+
+    # Display Daily Returns in the second column
+    with col2:
+        st.subheader("Daily Returns Summary")
+        st.dataframe(returns_data.describe())
+    
 
     # Risk Analysis
     st.header("Risk Analysis")
-    fig_1 = analyze_returns(returns_data)  # This line now includes the visualization
-    st.pyplot(fig_1)
-    plt.close(fig_1)
-    fig_2 = analyze_volatility(returns_data)  # This line now includes the visualization
-    st.pyplot(fig_2)
-    plt.close(fig_2)
-    fig_3 = analyze_cumulative_returns(returns_data)  # This line now includes the visualization
-    st.pyplot(fig_3)
-    plt.close(fig_3)
+    col3, col4, col5 = st.columns(3)
+
+    with col3:
+        fig_1 = analyze_returns(returns_data)  # This line now includes the visualization
+        st.pyplot(fig_1)
+        plt.close(fig_1)
+    
+    with col4:
+        fig_2 = analyze_volatility(returns_data)  # This line now includes the visualization
+        st.pyplot(fig_2)
+        plt.close(fig_2)
+    
+    with col5:
+        fig_3 = analyze_cumulative_returns(returns_data_without_date)  # This line now includes the visualization
+        st.pyplot(fig_3)
+        plt.close(fig_3)
 
     # VaR & CVaR Analysis
-    Var = calculate_var(returns_data, confidence_level)
-    cVar = calculate_cvar(returns_data, confidence_level)
-    fig_4 = visualize_drawdown(calculate_drawdown(returns_data))
-    st.pyplot(fig_4)
-    plt.close(fig_4)
-    fig_5 = visualize_var_cvar(returns_data, Var, cVar, confidence_level)
-    st.pyplot(fig_5)
-    plt.close(fig_5)
+    Var = calculate_var(returns_data_without_date, confidence_level)
+    cVar = calculate_cvar(returns_data_without_date, confidence_level)
+
+    col6, col7 = st.columns(2)
+    with col6:
+        fig_4 = visualize_drawdown(calculate_drawdown(returns_data_without_date))
+        st.pyplot(fig_4)
+        plt.close(fig_4)
+    
+    with col7:
+        fig_5 = visualize_var_cvar(returns_data_without_date, Var, cVar, confidence_level)
+        st.pyplot(fig_5)
+        plt.close(fig_5)
 
     # Portfolio Optimization
-    mean_returns = returns_data.mean()
-    cov_matrix = returns_data.cov()
+    mean_returns = returns_data_without_date.mean()
+    cov_matrix = returns_data_without_date.cov()
     num_assets = len(mean_returns)
     initial_weights = np.array([1.0 / num_assets] * num_assets)
 
@@ -183,7 +207,7 @@ if uploaded_close_prices_file is not None and uploaded_returns_file is not None:
     optimal_volatility = minimize(
         minimize_volatility,
         x0=initial_weights,
-        args=(mean_returns, cov_matrix),
+        args=(mean_returns, cov_matrix, risk_free_rate),
         method='SLSQP',
         bounds=bounds,
         constraints=constraints
@@ -196,19 +220,22 @@ if uploaded_close_prices_file is not None and uploaded_returns_file is not None:
 
     # Display Results
     st.header("Portfolio Optimization Results")
-    st.write("**Optimal Weights for Max Sharpe Ratio:**")
-    st.write(pd.DataFrame(optimal_weights_sharpe, index=returns_data.columns, columns=['Weight']))
-    st.write("**Portfolio Performance (Max Sharpe Ratio):**")
-    st.write(f"Expected Return: {portfolio_return_sharpe:.2f}%")
-    st.write(f"Volatility: {portfolio_volatility_sharpe:.2f}")
-    st.write(f"Sharpe Ratio: {portfolio_sharpe_ratio_sharpe:.2f}")
+    col8, col9 = st.columns(2)
+    with col8:
+        st.write("**Optimal Weights for Max Sharpe Ratio:**")
+        st.write(pd.DataFrame(optimal_weights_sharpe, index=returns_data_without_date.columns, columns=['Weight']))
+        st.write("**Portfolio Performance (Max Sharpe Ratio):**")
+        st.write(f"Expected Return: {portfolio_return_sharpe:.2f}%")
+        st.write(f"Volatility: {portfolio_volatility_sharpe:.2f}")
+        st.write(f"Sharpe Ratio: {portfolio_sharpe_ratio_sharpe:.2f}")
 
-    st.write("\n**Optimal Weights for Min Volatility:**")
-    st.write(pd.DataFrame(optimal_weights_volatility, index=returns_data.columns, columns=['Weight']))
-    st.write("**Portfolio Performance (Min Volatility):**")
-    st.write(f"Expected Return: {portfolio_return_volatility:.2f}%")
-    st.write(f"Volatility: {portfolio_volatility_volatility:.2f}")
-    st.write(f"Sharpe Ratio: {portfolio_sharpe_ratio_volatility:.2f}")
+    with col9:
+        st.write("\n**Optimal Weights for Min Volatility:**")
+        st.write(pd.DataFrame(optimal_weights_volatility, index=returns_data_without_date.columns, columns=['Weight']))
+        st.write("**Portfolio Performance (Min Volatility):**")
+        st.write(f"Expected Return: {portfolio_return_volatility:.2f}%")
+        st.write(f"Volatility: {portfolio_volatility_volatility:.2f}")
+        st.write(f"Sharpe Ratio: {portfolio_sharpe_ratio_volatility:.2f}")
 
     # Efficient Frontier
     st.header("Efficient Frontier")

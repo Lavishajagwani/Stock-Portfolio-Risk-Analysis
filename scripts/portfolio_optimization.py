@@ -75,7 +75,7 @@ def plot_efficient_frontier(mean_returns, cov_matrix, risk_free_rate, optimal_we
   Plot the efficient frontier with optimal portfolios highlighted.
   """
 
-  plt.figure(figsize=(12, 6))
+  plt.figure(figsize=(12, 3.5))
   plt.plot(frontier_volatilities, frontier_returns, 'b--', label="Efficient Frontier")
   plt.scatter(
     portfolio_performance(optimal_weights_sharpe, mean_returns, cov_matrix, risk_free_rate)[1],

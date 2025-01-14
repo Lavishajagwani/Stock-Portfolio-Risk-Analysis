@@ -76,7 +76,7 @@ def analyze_volatility(returns_data):
   print(volatility)
 
   # Step 7: Rolling Volatility
-  plt.figure(figsize=(12, 6))
+  plt.figure(figsize=(10, 8.69))
   for ticker in returns_data.columns:
     if pd.api.types.is_numeric_dtype(returns_data[ticker]):
       rolling_vol = returns_data[ticker].rolling(window=30).std() * np.sqrt(252)
@@ -100,8 +100,9 @@ def analyze_cumulative_returns(returns_data):
   """
 
   # Step 8: Cumulative Returns
+  # returns_data_without_date = returns_data.drop('Date', axis=1)
   cumulative_returns = (1 + returns_data).cumprod()
-  plt.figure(figsize=(12, 6))
+  plt.figure(figsize=(10, 9))
   cumulative_returns.plot()
   plt.title("Cumulative Returns Over Time")
   plt.xlabel("Date")
